@@ -1,6 +1,5 @@
 package pages;
 
-import models.User;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -39,15 +38,15 @@ public class LoginPage extends BasePage{
         return this;
     }
 
-    public LoginPage provideEmailAndContinue(User user) {
-        inputEmail.sendKeys(user.getEmail());
+    public LoginPage provideEmailAndContinue(String email) {
+        inputEmail.sendKeys(email);
         continueButton.click();
         return this;
     }
 
-    public LoginPage providePasswordAndLogin(User user) {
+    public LoginPage providePasswordAndLogin(String password) {
         wait.until(ExpectedConditions.visibilityOf(inputPassword));
-        inputPassword.sendKeys(user.getPassword());
+        inputPassword.sendKeys(password);
         loginButton.click();
         return this;
     }

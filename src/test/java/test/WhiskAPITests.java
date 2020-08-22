@@ -1,50 +1,56 @@
 package test;
 
+
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import org.json.JSONObject;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import utils.PropertyManager;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.anEmptyMap;
+import static org.hamcrest.Matchers.equalTo;
 
 
 public class WhiskAPITests {
 
-    String id, token = "4PkSbMXhfI4xMmdWy9xpTLLHkvImTGkY84zW9xbbdR8Dm4Q8FH0BL3Sdy73mdkSo";
-    String body = "{\n" +
-            "  \"name\": \"string\",\n" +
-            "  \"primary\": false\n" +
-            "}\n";
+    PropertyManager props = new PropertyManager();
+    String token = props.get("token");
+    String id;
+    JSONObject jsonObj = new JSONObject()
+            .put("name", "string")
+            .put("\nprimary", "false");
 
     @Test(description = "Create/Get shopping list.")
-    public void TestCase1() {
-        Response response = given()
+    public void testCase1() {
+        Response response1 = given()
                 .header("Authorization", "Bearer " + token)
-                .body(body)
+                .contentType(ContentType.JSON)
+                .body(jsonObj.toString())
                 .when()
-                    .contentType(ContentType.JSON)
-                    .post("https://api.whisk-dev.com/list/v2");
-        id = response.jsonPath().get("list.id");
+                .post("https://api.whisk-dev.com/list/v2");
+        id = response1.jsonPath().get("list.id");
 
-        given()
+        Response response2 = given()
                 .header("Authorization", "Bearer " + token)
                 .when()
-                    .get("https://api.whisk-dev.com/list/v2/{id}", id)
+                .get("https://api.whisk-dev.com/list/v2/{id}", id)
                 .then()
-                    .body("list.id", equalTo(id), "content", anEmptyMap());
-
+                .body("list.id", equalTo(id), "content", anEmptyMap())
+                .extract().response();
+        System.out.println(response2.body().asString());
     }
 
     @Test(description = "Create/Delete/Get shopping list.")
-    public void TestCase2() {
+    public void testCase2() {
         String responseMessage = "{\"code\":\"shoppingList.notFound\"}";
         Response response1 = given()
                 .header("Authorization", "Bearer " + token)
-                .body(body)
+                .contentType(ContentType.JSON)
+                .body(jsonObj.toString())
                 .when()
-                    .contentType(ContentType.JSON)
-                    .post("https://api.whisk-dev.com/list/v2");
+                .post("https://api.whisk-dev.com/list/v2");
         String id = response1.jsonPath().get("list.id");
 
         given()
@@ -55,10 +61,10 @@ public class WhiskAPITests {
         Response response2 = given()
                 .header("Authorization", "Bearer " + token)
                 .when()
-                    .get("https://api.whisk-dev.com/list/v2/{id}", id)
+                .get("https://api.whisk-dev.com/list/v2/{id}", id)
                 .then()
-                    .statusCode(400)//TODO statusCode is 200 in the test task
-                    .extract().response();
+                .statusCode(400)//TODO Expected status code is 400 BUT 200 in the test task
+                .extract().response();
         Assert.assertEquals(response2.asString().trim(),responseMessage, "Deleted shopping list was found!");
     }
 

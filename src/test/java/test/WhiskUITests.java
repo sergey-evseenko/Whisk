@@ -1,20 +1,18 @@
 package test;
 
-import models.User;
 import org.testng.annotations.Test;
 
 public class WhiskUITests extends BaseTest {
-    User user = new User("sergey.evseenko.qa@gmail.com", "Alfie_2244");
 
-    @Test(description = "Add five items to the Shopping list.")
+    @Test(description = "Add five items to the Shopping list", priority = 1)
     public void addItems(){
         loginPage
                 .openPage()
-                .provideEmailAndContinue(user)
-                .providePasswordAndLogin(user)
+                .provideEmailAndContinue(email)
+                .providePasswordAndLogin(password)
                 .onboardingAndVerifySuccess()
                 .openPage()
-                .createShoppingList()
+                .createShoppingList() //TODO transfer shopping list name
                 .addItemAndCheck("Milk")
                 .addItemAndCheck("Bread")
                 .addItemAndCheck("Onions")
@@ -22,15 +20,15 @@ public class WhiskUITests extends BaseTest {
                 .addItemAndCheck("Cheese");
     }
 
-    @Test(description = "Delete shopping list.")
+    @Test(description = "Delete shopping list", priority = 2)
     public void deleteShoppingList(){
         loginPage
                 .openPage()
-                .provideEmailAndContinue(user)
-                .providePasswordAndLogin(user)
+                .provideEmailAndContinue(email)
+                .providePasswordAndLogin(password)
                 .onboardingAndVerifySuccess()
                 .openPage()
-                .deleteShoppingList()
+                .deleteShoppingList() //TODO transfer shopping list name
                 .verifyNumberOfShoppingLists(0);
     }
 
